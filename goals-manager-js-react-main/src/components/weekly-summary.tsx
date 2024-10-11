@@ -9,8 +9,8 @@ import dayjs from "dayjs";
 import ptBR from "dayjs/locale/pt-BR";
 import { PendingGoals } from "./pending-goals";
 import { ChartNoAxesCombined } from 'lucide-react';
-import { DailyGoals } from "./daily-goals"; // Suponho que você já tenha o componente dos gráficos
-import { useState } from 'react'; // Importa o useState
+import { DailyGoals } from "./daily-goals";
+import { useState } from 'react';
 
 dayjs.locale(ptBR);
 
@@ -19,7 +19,7 @@ interface WeeklySummaryProps {
 }
 
 export function WeeklySummary({ summary }: WeeklySummaryProps) {
-  const [showGraph, setShowGraph] = useState(false); // Estado para controlar a exibição do gráfico
+  const [showGraph, setShowGraph] = useState(false); 
   const fromDate = dayjs().startOf("week").format("D[ de ]MMM");
   const toDate = dayjs().endOf("week").format("D[ de ]MMM");
   
@@ -28,7 +28,7 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
   );
 
   const handleShowGraph = () => {
-    setShowGraph(!showGraph); // Alterna a exibição do gráfico
+    setShowGraph(!showGraph);
   };
 
   return (
@@ -86,7 +86,7 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
 
         {showGraph && (
           <div>
-            <DailyGoals />
+            <DailyGoals dailyChart={[]}/>
           </div>
         )}
 
