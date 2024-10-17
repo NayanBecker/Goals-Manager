@@ -1,27 +1,43 @@
-import { CheckCircle2, Plus } from "lucide-react";
-import newIcon from '../assets/Goal-Manager-Logo.png';
+import { CheckCircle2, Plus, ChartNoAxesCombined} from "lucide-react";
+import newIcon from '@/assets/Goal-Manager-Logo.png';
+import { useState, useEffect } from 'react';
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { Button } from "./ui/button";
+import ptBR from "dayjs/locale/pt-BR";
+import dayjs from "dayjs";
+import { getDailyGoals, type GetDailyGoalsResponse } from "@/http/get-daily-goals";
+import type { GetSummaryResponse } from "@/http/get-summary";
 import { Progress, ProgressIndicator } from "./ui/progress-bar";
 import { Separator } from "./ui/separator";
-import type { GetSummaryResponse } from "../http/get-summary";
-import dayjs from "dayjs";
-import ptBR from "dayjs/locale/pt-BR";
-import { PendingGoals } from "./pending-goals";
-import { ChartNoAxesCombined } from 'lucide-react';
+import { Button } from "./ui/button";
 import { DailyGoals } from "./daily-goals";
-import { useState } from 'react';
+import { PendingGoals } from "./pending-goals";
+
 
 dayjs.locale(ptBR);
 
 interface WeeklySummaryProps {
-  summary: GetSummaryResponse["summary"];
+  summary: GetSummaryResponse["summary"]; 
 }
+
+
 
 export function WeeklySummary({ summary }: WeeklySummaryProps) {
   const [showGraph, setShowGraph] = useState(false); 
   const fromDate = dayjs().startOf("week").format("D[ de ]MMM");
   const toDate = dayjs().endOf("week").format("D[ de ]MMM");
+  const [dailyGoals, setDailyGoals] = useState<GetDailyGoalsResponse | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getDailyGoals();
+      setDailyGoals(data);
+    };
+    fetchData();
+  }, []);
+
+  if (!dailyGoals) {
+    return <div>Loading...</div>; // Ou um componente de carregamento
+  }
   
   const completedPercentage = Math.round(
     (summary.completed * 100) / summary.total,
@@ -29,6 +45,15 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
 
   const handleShowGraph = () => {
     setShowGraph(!showGraph);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        const data = await getDailyGoals();
+        setDailyGoals(data);
+      };
+      fetchData();
+    }, []);
+    
   };
 
   return (
@@ -45,6 +70,7 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
             {fromDate} - {toDate}
           </span>
         </div>
+
 
         <DialogTrigger asChild className="w-[25%]">
             <Button size="default" >
@@ -86,8 +112,9 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
 
         {showGraph && (
           <div>
-            <DailyGoals dailyChart={[]}/>
-          </div>
+              <DailyGoals dailyChart={dailyGoals.dailyChart} />
+              fetchData();
+          </div> 
         )}
 
 		{!showGraph && summary.goalsPerDay &&
