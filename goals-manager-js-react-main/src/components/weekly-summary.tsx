@@ -11,6 +11,10 @@ import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
 import { DailyGoals } from "./daily-goals";
 import { PendingGoals } from "./pending-goals";
+import { 
+  toDate,
+  fromDate
+} from "./ui/weekdate";
 
 
 dayjs.locale(ptBR);
@@ -23,37 +27,29 @@ interface WeeklySummaryProps {
 
 export function WeeklySummary({ summary }: WeeklySummaryProps) {
   const [showGraph, setShowGraph] = useState(false); 
-  const fromDate = dayjs().startOf("week").format("D[ de ]MMM");
-  const toDate = dayjs().endOf("week").format("D[ de ]MMM");
   const [dailyGoals, setDailyGoals] = useState<GetDailyGoalsResponse | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getDailyGoals();
-      setDailyGoals(data);
+      if (showGraph) {  // Fetch only if the graph is shown
+        const data = await getDailyGoals();
+        setDailyGoals(data);
+      }
     };
     fetchData();
-  }, []);
+  }, [showGraph]); // Re-fetch whenever showGraph changes
+ 
 
   if (!dailyGoals) {
-    return <div>Loading...</div>; // Ou um componente de carregamento
+    return <div>Loading...</div>;
   }
   
   const completedPercentage = Math.round(
     (summary.completed * 100) / summary.total,
+
   );
-
   const handleShowGraph = () => {
-    setShowGraph(!showGraph);
-
-    useEffect(() => {
-      const fetchData = async () => {
-        const data = await getDailyGoals();
-        setDailyGoals(data);
-      };
-      fetchData();
-    }, []);
-    
+    setShowGraph(!showGraph);    
   };
 
   return (
@@ -113,7 +109,6 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
         {showGraph && (
           <div>
               <DailyGoals dailyChart={dailyGoals.dailyChart} />
-              fetchData();
           </div> 
         )}
 

@@ -1,6 +1,5 @@
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import type { DailyGoalsProps } from "@/interfaces/dailychard"; // Mantém o nome da interface importada
+import type { DailyGoalsProps } from "@/interfaces/dailychard";
 
 import {
   Card,
@@ -16,22 +15,34 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import dayjs from "dayjs"; // Importa a biblioteca para manipular as datas
+import dayjs from "dayjs";
+import { filterGoalsByWeek, formatWeekRange, getWeekRange } from "./ui/filterByWeek";
+import { Button } from "./ui/button";
+import { useState } from "react";
+
 
 export const description = "A multiple bar chart";
 
-// Renomeia a interface local para evitar conflito
+
 interface DailyGoalsComponentProps {
-  dailyChart: DailyGoalsProps[]; // Usa a interface importada para tipar o array de dados
+  dailyChart: DailyGoalsProps[]; 
 }
 
 export function DailyGoals({ dailyChart }: DailyGoalsComponentProps) {
-  // Mapeando dailyChart para o formato esperado pelo Recharts
-  const mappedData = dailyChart.map((item) => ({
-    day: dayjs(item.date).format("dddd"), // Formata a data como o nome do dia da semana
+  const [weekOffset, setWeekOffset] = useState(0); 
+  const { startOfWeek, endOfWeek } = getWeekRange(weekOffset);
+  const formattedWeekRange = formatWeekRange(startOfWeek, endOfWeek);
+
+
+  const filteredData = filterGoalsByWeek(dailyChart, startOfWeek, endOfWeek);
+  
+  const mappedData = filteredData.map((item) => ({
+    day: dayjs(item.date).format("dddd"), 
     Total: item.total, // Total de metas criadas
     Completed: item.completed, // Total de metas completadas
   }));
+
+
 
   const chartConfig = {
     Total: {
@@ -47,17 +58,17 @@ export function DailyGoals({ dailyChart }: DailyGoalsComponentProps) {
   
   return (
     
-    <Card>
+    <Card className="bg-ring backdrop-brightness-50 bg-opacity-35">
       <CardHeader>
-        <CardTitle>Bar Chart - Weekly Goals</CardTitle>
-        <CardDescription>My Week's Goals</CardDescription>
+        <CardTitle className="text-white">Metas da Semana</CardTitle>
+        <CardDescription><span>{formattedWeekRange}</span></CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+        <ChartContainer config={chartConfig} className="min-h-[200px] w-full ">
           <BarChart data={mappedData}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="day" // Exibe o nome do dia da semana (segunda, terça, etc.)
+              dataKey="day"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
@@ -68,17 +79,15 @@ export function DailyGoals({ dailyChart }: DailyGoalsComponentProps) {
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Bar dataKey="Total" fill={chartConfig.Total.color} radius={4} />
-            <Bar
-              dataKey="Completed"
-              fill={chartConfig.Completed.color}
-              radius={4}
-            />
+            <Bar dataKey="Completed" fill={chartConfig.Completed.color} radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        {/* Footer opcional, removido para manter o código mais limpo */}
+      <CardFooter className="flex-row items-center justify-between gap-2 text-sm ">
+        <Button onClick={() => setWeekOffset(weekOffset - 1)}>Semana Anterior</Button>
+        <Button onClick={() => setWeekOffset(weekOffset + 1)}>Próxima Semana</Button>
       </CardFooter>
     </Card>
   );
 }
+

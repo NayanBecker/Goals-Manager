@@ -1,4 +1,4 @@
-import { Plus, Pencil, Trash2, } from 'lucide-react'
+import { Plus, Trash2, } from 'lucide-react'
 import { OutlineButton } from './ui/outline-button'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getPendingGoals } from '../http/get-pending-goals'
@@ -42,9 +42,6 @@ export function PendingGoals() {
               </div>
               {!isGoalCompleted && (
                 <div className="flex items-center gap-3">
-                  <Button /*onClick={}*/ className='w-12 h-8 bg-inherit hover:bg-slate-500 hover:bg-opacity-20'>
-                  <Pencil className="text-blue-300" />
-                  </Button>
 
                   <Button /*onClick={}*/ className='w-12 h-8 bg-inherit hover:bg-slate-500 hover:bg-opacity-20'>
                   <Trash2 className="text-red-800 " />
