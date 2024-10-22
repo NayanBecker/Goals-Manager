@@ -38,11 +38,6 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
     };
     fetchData();
   }, [showGraph]); // Re-fetch whenever showGraph changes
- 
-
-  if (!dailyGoals) {
-    return <div>Loading...</div>;
-  }
   
   const completedPercentage = Math.round(
     (summary.completed * 100) / summary.total,
@@ -106,10 +101,14 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
           </Button>
         </div>
 
-        {showGraph && (
+        {showGraph && dailyGoals === null && (
+          <div className="text-white text-center">Loading...</div> // Show loading message
+        )}
+
+        {showGraph && dailyGoals && (
           <div>
-              <DailyGoals dailyChart={dailyGoals.dailyChart} />
-          </div> 
+            <DailyGoals dailyChart={dailyGoals.dailyChart} />
+          </div>
         )}
 
 		{!showGraph && summary.goalsPerDay &&
