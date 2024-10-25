@@ -1,8 +1,9 @@
 import type{ DailyGoalsProps } from "@/interfaces/dailychard";
 import dayjs from "dayjs";
-import "dayjs/locale/pt-br";
+import ptBR from "dayjs/locale/pt-BR";
 
-dayjs.locale("pt-br");
+
+dayjs.locale(ptBR);
 
 
 function filterGoalsByWeek(dailyChart: DailyGoalsProps[], startOfWeek: dayjs.Dayjs, endOfWeek: dayjs.Dayjs) {
