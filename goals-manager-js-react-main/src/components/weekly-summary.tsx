@@ -31,13 +31,13 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (showGraph) {  // Fetch only if the graph is shown
+      if (showGraph) {
         const data = await getDailyGoals();
         setDailyGoals(data);
       }
     };
     fetchData();
-  }, [showGraph]); // Re-fetch whenever showGraph changes
+  }, [showGraph]); // 
   
   const completedPercentage = Math.round(
     (summary.completed * 100) / summary.total,
