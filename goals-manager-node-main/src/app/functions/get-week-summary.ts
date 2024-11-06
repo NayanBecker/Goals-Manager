@@ -5,8 +5,11 @@ import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { and, desc, eq, sql } from 'drizzle-orm'
 
 dayjs.extend(weekOfYear)
+interface GetWeekSummaryRequest {
+  userId: string
+}
 
-export async function getWeekSummary() {
+export async function getWeekSummary({ userId }: GetWeekSummaryRequest) {
   const currentYear = dayjs().year()
   const currentWeek = dayjs().week()
 
@@ -22,7 +25,8 @@ export async function getWeekSummary() {
       .where(
         and(
           sql`EXTRACT(YEAR FROM ${goals.createdAt}) <= ${currentYear}`,
-          sql`EXTRACT(WEEK FROM ${goals.createdAt}) <= ${currentWeek}`
+          sql`EXTRACT(WEEK FROM ${goals.createdAt}) <= ${currentWeek}`,
+          eq(goals.userId, userId)
         )
       )
   )
@@ -43,7 +47,8 @@ export async function getWeekSummary() {
       .where(
         and(
           sql`EXTRACT(YEAR FROM ${goals.createdAt}) = ${currentYear}`,
-          sql`EXTRACT(WEEK FROM ${goals.createdAt}) = ${currentWeek}`
+          sql`EXTRACT(WEEK FROM ${goals.createdAt}) = ${currentWeek}`,
+          eq(goals.userId, userId)
         )
       )
   )
