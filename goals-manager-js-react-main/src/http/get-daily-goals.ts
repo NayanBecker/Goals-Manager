@@ -1,11 +1,11 @@
 export interface DailyGoal {
-  date: string // Data no formato yyyy-mm-dd
-  completed: number // Total de metas completadas no dia
-  total: number // Total de metas criadas no dia
+  date: string
+  completed: number
+  total: number
 }
 
 export interface GetDailyGoalsResponse {
-  dailyChart: DailyGoal[] // Array com os dados diários de metas
+  dailyChart: DailyGoal[]
 }
 
 export async function getDailyGoals(): Promise<GetDailyGoalsResponse> {
@@ -17,7 +17,6 @@ export async function getDailyGoals(): Promise<GetDailyGoalsResponse> {
 
   const data = await response.json()
 
-  // Validação mínima dos dados recebidos, garantindo que seja um array de `DailyGoal`
   if (!Array.isArray(data.dailyChart)) {
     throw new Error('Invalid response format')
   }
@@ -25,9 +24,9 @@ export async function getDailyGoals(): Promise<GetDailyGoalsResponse> {
   return {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     dailyChart: data.dailyChart.map((item: any) => ({
-      date: String(item.date), // Garante que 'date' seja string
-      completed: Number(item.completed), // Garante que 'completed' seja number
-      total: Number(item.total), // Garante que 'total' seja number
+      date: String(item.date),
+      completed: Number(item.completed),
+      total: Number(item.total),
     })),
   }
 }
