@@ -9,6 +9,7 @@ export const getWeekPendingGoalsRoute: FastifyPluginAsyncZod = async app => {
       onRequest: [authenticatedUserHook],
       schema: {
         tags: ['goals'],
+        operationId: 'getWeekPendingGoals',
         description: 'Daily Chart',
       },
     },

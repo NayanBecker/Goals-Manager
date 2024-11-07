@@ -9,6 +9,7 @@ export const getWeekSummaryRoute: FastifyPluginAsyncZod = async app => {
       onRequest: [authenticatedUserHook],
       schema: {
         tags: ['goals'],
+        operationId: 'getWeekSummary',
         description: 'Daily Chart',
       },
     },

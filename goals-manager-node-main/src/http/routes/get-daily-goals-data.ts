@@ -9,6 +9,7 @@ export const getDailyGoalsChartRoute: FastifyPluginAsyncZod = async app => {
       onRequest: [authenticatedUserHook],
       schema: {
         tags: ['goals'],
+        operationId: 'getDailyGoalsChart',
         description: 'Daily Chart',
       },
     },

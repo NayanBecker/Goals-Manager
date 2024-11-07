@@ -5,6 +5,8 @@ import imglogo from '@/assets/DALL_E-2024-09-27-21.10-removebg-preview (1) (1).p
 import BackgroundEmptyGoals from '../assets/EmptyGoalsBG.svg'
 import { Button } from './ui/button'
 
+// const BackgroundEmptyGoals =  '../assets/EmptyGoalsBG.svg'
+
 export function EmptyGoals() {
   return (
     <main

@@ -18,6 +18,8 @@ import { deleteGoalRoute } from './routes/Delete-goal'
 import { authenticateFromGithubRoute } from './routes/authenticate-github-user'
 import { env } from '@/env'
 import { getProfileRoute } from './routes/get-profile'
+import { resolve } from 'node:path'
+import { writeFile } from 'node:fs/promises'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -55,3 +57,15 @@ app.register(getProfileRoute)
 app.listen({ port: 3333 }).then(() => {
   console.log('HTTP server running!')
 })
+
+if (env.NODE_ENV === 'development') {
+  const specFile = resolve(__dirname, '../../swagger.json')
+
+  app.ready().then(() => {
+    const spec = JSON.stringify(app.swagger(), null, 4)
+
+    writeFile(specFile, spec).then(() => {
+      console.log('Swagger spec was generated!')
+    })
+  })
+}
