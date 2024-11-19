@@ -1,3 +1,5 @@
+import Cookies from 'universal-cookie'
+
 export interface DailyGoal {
   date: string
   completed: number
@@ -9,7 +11,14 @@ export interface GetDailyGoalsResponse {
 }
 
 export async function getDailyGoals(): Promise<GetDailyGoalsResponse> {
-  const response = await fetch('http://localhost:3333/daily-goals-chart')
+  const cookies = new Cookies()
+  const token = cookies.get('goals-manager.token')
+
+  const response = await fetch('http://localhost:3333/daily-goals-chart', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
 
   if (!response.ok) {
     throw new Error('Failed to fetch daily goals data')

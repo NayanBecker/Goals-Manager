@@ -13,10 +13,11 @@ interface GetWeekPendingGoalsRequest {
 export async function getWeekPendingGoals({
   userId,
 }: GetWeekPendingGoalsRequest) {
-  const currentYear = dayjs().year()
-  const currentWeek = dayjs().week()
   const firstDayOfWeek = dayjs().startOf('week').toDate()
   const lastDayOfWeek = dayjs().endOf('week').toDate()
+
+  console.log('User ID:', userId)
+  console.log('Período da semana:', firstDayOfWeek, lastDayOfWeek)
 
   const goalsCreatedUpToWeek = db.$with('goals_created_up_to_week').as(
     db
@@ -29,12 +30,13 @@ export async function getWeekPendingGoals({
       .from(goals)
       .where(
         and(
-          sql`EXTRACT(YEAR FROM ${goals.createdAt}) <= ${currentYear}`,
-          sql`EXTRACT(WEEK FROM ${goals.createdAt}) <= ${currentWeek}`,
+          gte(goals.createdAt, firstDayOfWeek),
+          lte(goals.createdAt, lastDayOfWeek),
           eq(goals.userId, userId)
         )
       )
   )
+  console.log('Goals created up to week:', goalsCreatedUpToWeek)
 
   const goalCompletionCounts = db.$with('goal_completion_counts').as(
     db
@@ -51,8 +53,9 @@ export async function getWeekPendingGoals({
           eq(goals.userId, userId)
         )
       )
-      .groupBy(goalCompletions.goalId)
+      .groupBy(goals.id)
   )
+  console.log('Goal completion counts:', goalCompletionCounts)
 
   const pendingGoals = await db
     .with(goalsCreatedUpToWeek, goalCompletionCounts)
@@ -60,17 +63,15 @@ export async function getWeekPendingGoals({
       id: goalsCreatedUpToWeek.id,
       title: goalsCreatedUpToWeek.title,
       desiredWeeklyFrequency: goalsCreatedUpToWeek.desiredWeeklyFrequency,
-      completionCount:
-        sql /*sql*/`COALESCE(${goalCompletionCounts.completionCount}, 0)`.mapWith(
-          Number
-        ),
+      completionCount: sql /*sql*/`
+        COALESCE(${goalCompletionCounts.completionCount}, 0)`.mapWith(Number),
     })
     .from(goalsCreatedUpToWeek)
-    .orderBy(asc(goalsCreatedUpToWeek.createdAt))
     .leftJoin(
       goalCompletionCounts,
-      eq(goalsCreatedUpToWeek.id, goalCompletionCounts.goalId)
+      eq(goalCompletionCounts.goalId, goalsCreatedUpToWeek.id)
     )
+  console.log('Pending Goals Final:', pendingGoals)
 
   return { pendingGoals }
 }

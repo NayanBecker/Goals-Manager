@@ -1,39 +1,39 @@
-import { useAuthenticateFromGithub } from "@/http/generated/api"
-import { Loader2 } from "lucide-react"
-import { useEffect } from "react"
-import { Navigate, useSearchParams, useNavigate } from "react-router-dom"
-import Cookies from 'universal-cookie'
+import { useAuthenticateFromGithub } from "@/http/generated/api";
+import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { Navigate, useSearchParams, useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
 
-export function SignInWithGithubCallback(){
-    const navigate = useNavigate()
+export function SignInWithGithubCallback() {
+  const navigate = useNavigate();
 
-    const { mutateAsync: authenticateFromGithub } = useAuthenticateFromGithub()
+  const { mutateAsync: authenticateFromGithub } = useAuthenticateFromGithub();
 
-const [searchParams] = useSearchParams()
-const code = searchParams.get('code')
+  const [searchParams] = useSearchParams();
+  const code = searchParams.get("code");
 
-if (!code) {
-    return <Navigate to="/" />
-}
+  if (!code) {
+    return <Navigate to="/" />;
+  }
 
-useEffect(() => {
-    authenticateFromGithub({ data: { code } }).then(response => {
-        const token = response.data.token
-        const cookies = new Cookies()
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    authenticateFromGithub({ data: { code } }).then((response) => {
+      const token = response.data.token;
+      const cookies = new Cookies();
 
-        cookies.set('goals-manager.token', token, {
-            path: '/',
-            maxAge: 60 * 60 * 24 //24h
-        })
+      cookies.set("goals-manager.token", token, {
+        path: "/",
+        maxAge: 60 * 60 * 24, //24h
+      });
 
+      navigate("/app");
+    });
+  }, []);
 
-        navigate('/app')
-    })
-}, [])
-
-    return(
-        <div className="h-screen flex items-center justify-center"> 
-            <Loader2 className="size-8 text-green-50 animate-spin"/>
-        </div>
-    )
+  return (
+    <div className="h-screen flex items-center justify-center">
+      <Loader2 className="size-8 text-green-50 animate-spin" />
+    </div>
+  );
 }

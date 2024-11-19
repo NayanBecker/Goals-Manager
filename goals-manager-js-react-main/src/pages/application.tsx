@@ -5,21 +5,31 @@ import { useQuery } from '@tanstack/react-query'
 import { getSummary } from '../http/get-summary'
 import { Loader2 } from 'lucide-react'
 import { EmptyGoals } from '../components/empty-goals'
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
+
+
 
 export function Application() {
+  const { isAuthenticated } = useAuth()
+  if (!isAuthenticated) {
+    return <Navigate to="/" />
+  }
+
+  
   const { data, isLoading } = useQuery({
     queryKey: ['summary'],
     queryFn: getSummary,
   })
-
+  
   if (isLoading || !data) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <Loader2 className="text-zinc-500 animate-spin size-10" />
+        <Loader2 className="text-zinc-500 animate-spin size-10" />  
       </div>
     )
   }
-
+  
   return (
     <Dialog>
       {data.summary.total > 0 ? (
@@ -32,3 +42,4 @@ export function Application() {
     </Dialog>
   )
 }
+

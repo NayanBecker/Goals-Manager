@@ -41,6 +41,21 @@ export type AuthenticateFromGithubBody = {
   code: string;
 };
 
+export type GetPendingGoals200PendingGoalsItem = {
+  completionCount: number;
+  desiredWeeklyFrequency: number;
+  id: string;
+  title: string;
+};
+
+export type GetPendingGoals200 = {
+  pendingGoals: GetPendingGoals200PendingGoalsItem[];
+};
+
+export type GetWeekSummaryParams = {
+weekStartsAt?: string;
+};
+
 export type CreateGoalCompletionBody = {
   goalId: string;
 };
@@ -212,22 +227,29 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?? {};
     }
     
 /**
- * Daily Chart
+ * Get week summary
  */
 export type getWeekSummaryResponse = {
   data: void;
   status: number;
 }
 
-export const getGetWeekSummaryUrl = () => {
+export const getGetWeekSummaryUrl = (params?: GetWeekSummaryParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
-  return `http://localhost:3333/summary`
+  return normalizedParams.size ? `http://localhost:3333/summary?${normalizedParams.toString()}` : `http://localhost:3333/summary`
 }
 
-export const getWeekSummary = async ( options?: RequestInit): Promise<getWeekSummaryResponse> => {
+export const getWeekSummary = async (params?: GetWeekSummaryParams, options?: RequestInit): Promise<getWeekSummaryResponse> => {
   
-  const res = await fetch(getGetWeekSummaryUrl(),
+  const res = await fetch(getGetWeekSummaryUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -243,21 +265,21 @@ export const getWeekSummary = async ( options?: RequestInit): Promise<getWeekSum
 
 
 
-export const getGetWeekSummaryQueryKey = () => {
-    return [`http://localhost:3333/summary`] as const;
+export const getGetWeekSummaryQueryKey = (params?: GetWeekSummaryParams,) => {
+    return [`http://localhost:3333/summary`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getGetWeekSummaryQueryOptions = <TData = Awaited<ReturnType<typeof getWeekSummary>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>>, fetch?: RequestInit}
+export const getGetWeekSummaryQueryOptions = <TData = Awaited<ReturnType<typeof getWeekSummary>>, TError = unknown>(params?: GetWeekSummaryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetWeekSummaryQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetWeekSummaryQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWeekSummary>>> = ({ signal }) => getWeekSummary({ signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWeekSummary>>> = ({ signal }) => getWeekSummary(params, { signal, ...fetchOptions });
 
       
 
@@ -271,7 +293,7 @@ export type GetWeekSummaryQueryError = unknown
 
 
 export function useGetWeekSummary<TData = Awaited<ReturnType<typeof getWeekSummary>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>> & Pick<
+ params: undefined |  GetWeekSummaryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWeekSummary>>,
           TError,
@@ -281,7 +303,7 @@ export function useGetWeekSummary<TData = Awaited<ReturnType<typeof getWeekSumma
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
 export function useGetWeekSummary<TData = Awaited<ReturnType<typeof getWeekSummary>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>> & Pick<
+ params?: GetWeekSummaryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWeekSummary>>,
           TError,
@@ -291,16 +313,16 @@ export function useGetWeekSummary<TData = Awaited<ReturnType<typeof getWeekSumma
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 export function useGetWeekSummary<TData = Awaited<ReturnType<typeof getWeekSummary>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>>, fetch?: RequestInit}
+ params?: GetWeekSummaryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>>, fetch?: RequestInit}
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 
 export function useGetWeekSummary<TData = Awaited<ReturnType<typeof getWeekSummary>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>>, fetch?: RequestInit}
+ params?: GetWeekSummaryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekSummary>>, TError, TData>>, fetch?: RequestInit}
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetWeekSummaryQueryOptions(options)
+  const queryOptions = getGetWeekSummaryQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -313,22 +335,22 @@ export function useGetWeekSummary<TData = Awaited<ReturnType<typeof getWeekSumma
 
 
 /**
- * Daily Chart
+ * Get pending goals
  */
-export type getWeekPendingGoalsResponse = {
-  data: void;
+export type getPendingGoalsResponse = {
+  data: GetPendingGoals200;
   status: number;
 }
 
-export const getGetWeekPendingGoalsUrl = () => {
+export const getGetPendingGoalsUrl = () => {
 
 
   return `http://localhost:3333/pending-goals`
 }
 
-export const getWeekPendingGoals = async ( options?: RequestInit): Promise<getWeekPendingGoalsResponse> => {
+export const getPendingGoals = async ( options?: RequestInit): Promise<getPendingGoalsResponse> => {
   
-  const res = await fetch(getGetWeekPendingGoalsUrl(),
+  const res = await fetch(getGetPendingGoalsUrl(),
   {      
     ...options,
     method: 'GET'
@@ -344,64 +366,64 @@ export const getWeekPendingGoals = async ( options?: RequestInit): Promise<getWe
 
 
 
-export const getGetWeekPendingGoalsQueryKey = () => {
+export const getGetPendingGoalsQueryKey = () => {
     return [`http://localhost:3333/pending-goals`] as const;
     }
 
     
-export const getGetWeekPendingGoalsQueryOptions = <TData = Awaited<ReturnType<typeof getWeekPendingGoals>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekPendingGoals>>, TError, TData>>, fetch?: RequestInit}
+export const getGetPendingGoalsQueryOptions = <TData = Awaited<ReturnType<typeof getPendingGoals>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPendingGoals>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetWeekPendingGoalsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetPendingGoalsQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWeekPendingGoals>>> = ({ signal }) => getWeekPendingGoals({ signal, ...fetchOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPendingGoals>>> = ({ signal }) => getPendingGoals({ signal, ...fetchOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWeekPendingGoals>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPendingGoals>>, TError, TData> & { queryKey: QueryKey }
 }
 
-export type GetWeekPendingGoalsQueryResult = NonNullable<Awaited<ReturnType<typeof getWeekPendingGoals>>>
-export type GetWeekPendingGoalsQueryError = unknown
+export type GetPendingGoalsQueryResult = NonNullable<Awaited<ReturnType<typeof getPendingGoals>>>
+export type GetPendingGoalsQueryError = unknown
 
 
-export function useGetWeekPendingGoals<TData = Awaited<ReturnType<typeof getWeekPendingGoals>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekPendingGoals>>, TError, TData>> & Pick<
+export function useGetPendingGoals<TData = Awaited<ReturnType<typeof getPendingGoals>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPendingGoals>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getWeekPendingGoals>>,
+          Awaited<ReturnType<typeof getPendingGoals>>,
           TError,
           TData
         > , 'initialData'
       >, fetch?: RequestInit}
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useGetWeekPendingGoals<TData = Awaited<ReturnType<typeof getWeekPendingGoals>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekPendingGoals>>, TError, TData>> & Pick<
+export function useGetPendingGoals<TData = Awaited<ReturnType<typeof getPendingGoals>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPendingGoals>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getWeekPendingGoals>>,
+          Awaited<ReturnType<typeof getPendingGoals>>,
           TError,
           TData
         > , 'initialData'
       >, fetch?: RequestInit}
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useGetWeekPendingGoals<TData = Awaited<ReturnType<typeof getWeekPendingGoals>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekPendingGoals>>, TError, TData>>, fetch?: RequestInit}
+export function useGetPendingGoals<TData = Awaited<ReturnType<typeof getPendingGoals>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPendingGoals>>, TError, TData>>, fetch?: RequestInit}
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 
-export function useGetWeekPendingGoals<TData = Awaited<ReturnType<typeof getWeekPendingGoals>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeekPendingGoals>>, TError, TData>>, fetch?: RequestInit}
+export function useGetPendingGoals<TData = Awaited<ReturnType<typeof getPendingGoals>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPendingGoals>>, TError, TData>>, fetch?: RequestInit}
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetWeekPendingGoalsQueryOptions(options)
+  const queryOptions = getGetPendingGoalsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -525,7 +547,7 @@ export type deleteGoalResponse = {
 export const getDeleteGoalUrl = (id: string,) => {
 
 
-  return `http://localhost:3333/goals/${id}`
+  return `http://localhost:3333/delete/${id}`
 }
 
 export const deleteGoal = async (id: string, options?: RequestInit): Promise<deleteGoalResponse> => {

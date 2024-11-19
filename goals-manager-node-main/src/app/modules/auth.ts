@@ -4,7 +4,7 @@ import { SignJWT } from 'jose'
 export async function authenticatedUser(userId: string) {
   const secret = new TextEncoder().encode(env.JWT_SECRET)
 
-  const token = await new SignJWT()
+  const token = await new SignJWT({ sub: userId })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(userId)
     .setExpirationTime('1d')

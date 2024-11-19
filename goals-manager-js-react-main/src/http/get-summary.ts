@@ -1,3 +1,4 @@
+import Cookies from 'universal-cookie'
 export interface GetSummaryResponse {
   summary: {
     completed: number
@@ -14,8 +15,20 @@ export interface GetSummaryResponse {
 }
 
 export async function getSummary(): Promise<GetSummaryResponse> {
-  const response = await fetch('http://localhost:3333/summary')
-  const data = await response.json()
+  const cookies = new Cookies()
+  const token = cookies.get('goals-manager.token')
+  console.log('Token enviado para o backend:', token)
 
+  const response = await fetch('http://localhost:3333/summary', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Error fetching summary data')
+  }
+
+  const data = await response.json()
   return data
 }

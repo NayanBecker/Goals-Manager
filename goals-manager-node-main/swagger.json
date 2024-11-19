@@ -96,7 +96,19 @@
                 "tags": [
                     "goals"
                 ],
-                "description": "Daily Chart",
+                "description": "Get week summary",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time",
+                            "default": {}
+                        },
+                        "in": "query",
+                        "name": "weekStartsAt",
+                        "required": false
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Default Response"
@@ -106,14 +118,54 @@
         },
         "/pending-goals": {
             "get": {
-                "operationId": "getWeekPendingGoals",
+                "operationId": "getPendingGoals",
                 "tags": [
                     "goals"
                 ],
-                "description": "Daily Chart",
+                "description": "Get pending goals",
                 "responses": {
                     "200": {
-                        "description": "Default Response"
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "pendingGoals": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "desiredWeeklyFrequency": {
+                                                        "type": "number"
+                                                    },
+                                                    "completionCount": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "title",
+                                                    "desiredWeeklyFrequency",
+                                                    "completionCount"
+                                                ],
+                                                "additionalProperties": false
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "pendingGoals"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -132,7 +184,7 @@
                 }
             }
         },
-        "/goals/{id}": {
+        "/delete/{id}": {
             "delete": {
                 "operationId": "deleteGoal",
                 "tags": [
