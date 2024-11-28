@@ -4,6 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getPendingGoals } from '../http/get-pending-goals'
 import { createGoalCompletion } from '../http/create-goal-completion'
 import { Button } from './ui/button'
+import { getDailyGoals } from '../http/get-daily-goals'
+
 
 export function PendingGoals() {
   const queryClient = useQueryClient()
@@ -12,6 +14,13 @@ export function PendingGoals() {
     queryKey: ['pending-goals'],
     queryFn: getPendingGoals,
   })
+
+  async function fetchData() {
+
+      const data = await getDailyGoals();
+      setDailyGoals(data);
+    
+  }
 
   if (isLoading || !data) {
     return null
@@ -22,6 +31,9 @@ export function PendingGoals() {
 
     queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
     queryClient.invalidateQueries({ queryKey: ['summary'] })
+
+    await fetchData();
+
   }
 
   return (
@@ -49,7 +61,7 @@ export function PendingGoals() {
                 </div>
               )}
             </div>
-              </OutlineButton>
+          </OutlineButton>
         );
       })}
     </div>

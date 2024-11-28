@@ -1,36 +1,35 @@
-import { X, Crosshair} from 'lucide-react'
+import { X, Crosshair } from "lucide-react";
 
-
-import { Button } from './ui/button'
+import { Button } from "./ui/button";
 import {
   RadioGroup,
   RadioGroupIndicator,
   RadioGroupItem,
-} from './ui/radio-group'
+} from "./ui/radio-group";
 import {
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from './ui/dialog'
-import { Input } from './ui/input'
-import { Label } from './ui/label'
-import { z } from 'zod'
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { createGoal } from '../http/create-goal'
-import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
+} from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { z } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createGoal } from "../http/create-goal";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 const createGoalSchema = z.object({
-  title: z.string().min(1, 'Informe a atividade que deseja praticar'),
+  title: z.string().min(1, "Informe a atividade que deseja praticar"),
   desiredWeeklyFrequency: z.coerce.number().min(1).max(7),
-})
+});
 
-type CreateGoalSchema = z.infer<typeof createGoalSchema>
+type CreateGoalSchema = z.infer<typeof createGoalSchema>;
 
 export function CreateGoal() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -40,7 +39,7 @@ export function CreateGoal() {
     reset,
   } = useForm<CreateGoalSchema>({
     resolver: zodResolver(createGoalSchema),
-  })
+  });
 
   async function handleCreateGoal({
     title,
@@ -50,16 +49,16 @@ export function CreateGoal() {
       await createGoal({
         title,
         desiredWeeklyFrequency,
-      })
+      });
 
-      reset()
+      reset();
 
-      queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
-      queryClient.invalidateQueries({ queryKey: ['summary'] })
+      queryClient.invalidateQueries({ queryKey: ["pending-goals"] });
+      queryClient.invalidateQueries({ queryKey: ["summary"] });
 
-      toast.success('Meta criada com sucesso!')
+      toast.success("Meta criada com sucesso!");
     } catch {
-      toast.error('Erro ao criar a meta, tente novamente!')
+      toast.error("Erro ao criar a meta, tente novamente!");
     }
   }
 
@@ -93,7 +92,7 @@ export function CreateGoal() {
                 id="title"
                 autoFocus
                 placeholder="Praticar exercícios, meditar, etc..."
-                {...register('title')}
+                {...register("title")}
               />
 
               {errors.title && (
@@ -117,21 +116,27 @@ export function CreateGoal() {
                       onValueChange={field.onChange}
                     >
                       {Array.from({ length: 7 }).map((_, i) => {
-                        const frequency = String(i + 1)
+                        const frequency = String(i + 1);
 
                         return (
                           // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                            <RadioGroupItem key={i} value={frequency}>
+                          <RadioGroupItem key={i} value={frequency}>
                             <RadioGroupIndicator />
                             <span className="text-zinc-300 text-sm font-medium leading-none">
                               {frequency}x na semana
                             </span>
-                            <span className="text-lg leading-none"><Crosshair color='#2311ac' stroke-width='3' width={18}/></span>
+                            <span className="text-lg leading-none">
+                              <Crosshair
+                                color="#2311ac"
+                                strokeWidth="3"
+                                width={18}
+                              />
+                            </span>
                           </RadioGroupItem>
-                        )
+                        );
                       })}
                     </RadioGroup>
-                  )
+                  );
                 }}
               />
             </div>
@@ -151,5 +156,5 @@ export function CreateGoal() {
         </form>
       </div>
     </DialogContent>
-  )
+  );
 }
