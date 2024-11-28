@@ -41,6 +41,21 @@ export type AuthenticateFromGithubBody = {
   code: string;
 };
 
+export type DeleteGoal404 = {
+  message: string;
+};
+
+/**
+ * @nullable
+ */
+export type DeleteGoal200 = typeof DeleteGoal200[keyof typeof DeleteGoal200] | null;
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DeleteGoal200 = {
+  null: 'null',
+} as const;
+
 export type GetPendingGoals200PendingGoalsItem = {
   completionCount: number;
   desiredWeeklyFrequency: number;
@@ -537,22 +552,22 @@ export function useGetDailyGoalsChart<TData = Awaited<ReturnType<typeof getDaily
 
 
 /**
- * Daily Chart
+ * Delete a goal by its ID
  */
 export type deleteGoalResponse = {
-  data: void;
+  data: DeleteGoal200;
   status: number;
 }
 
-export const getDeleteGoalUrl = (id: string,) => {
+export const getDeleteGoalUrl = (goalId: string,) => {
 
 
-  return `http://localhost:3333/delete/${id}`
+  return `http://localhost:3333/delete/${goalId}`
 }
 
-export const deleteGoal = async (id: string, options?: RequestInit): Promise<deleteGoalResponse> => {
+export const deleteGoal = async (goalId: string, options?: RequestInit): Promise<deleteGoalResponse> => {
   
-  const res = await fetch(getDeleteGoalUrl(id),
+  const res = await fetch(getDeleteGoalUrl(goalId),
   {      
     ...options,
     method: 'DELETE'
@@ -569,18 +584,18 @@ export const deleteGoal = async (id: string, options?: RequestInit): Promise<del
 
 
 
-export const getDeleteGoalMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteGoal>>, TError,{id: string}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteGoal>>, TError,{id: string}, TContext> => {
+export const getDeleteGoalMutationOptions = <TError = DeleteGoal404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteGoal>>, TError,{goalId: string}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteGoal>>, TError,{goalId: string}, TContext> => {
 const {mutation: mutationOptions, fetch: fetchOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteGoal>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteGoal>>, {goalId: string}> = (props) => {
+          const {goalId} = props ?? {};
 
-          return  deleteGoal(id,fetchOptions)
+          return  deleteGoal(goalId,fetchOptions)
         }
 
         
@@ -590,14 +605,14 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?? {};
 
     export type DeleteGoalMutationResult = NonNullable<Awaited<ReturnType<typeof deleteGoal>>>
     
-    export type DeleteGoalMutationError = unknown
+    export type DeleteGoalMutationError = DeleteGoal404
 
-    export const useDeleteGoal = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteGoal>>, TError,{id: string}, TContext>, fetch?: RequestInit}
+    export const useDeleteGoal = <TError = DeleteGoal404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteGoal>>, TError,{goalId: string}, TContext>, fetch?: RequestInit}
 ): UseMutationResult<
         Awaited<ReturnType<typeof deleteGoal>>,
         TError,
-        {id: string},
+        {goalId: string},
         TContext
       > => {
 

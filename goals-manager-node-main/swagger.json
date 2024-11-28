@@ -184,27 +184,55 @@
                 }
             }
         },
-        "/delete/{id}": {
+        "/delete/{goalId}": {
             "delete": {
                 "operationId": "deleteGoal",
                 "tags": [
                     "goals"
                 ],
-                "description": "Daily Chart",
+                "description": "Delete a goal by its ID",
                 "parameters": [
                     {
                         "schema": {
-                            "type": "string",
-                            "format": "uuid"
+                            "type": "string"
                         },
                         "in": "path",
-                        "name": "id",
+                        "name": "goalId",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Default Response"
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "enum": [
+                                        "null"
+                                    ],
+                                    "nullable": true
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
                     }
                 }
             }
