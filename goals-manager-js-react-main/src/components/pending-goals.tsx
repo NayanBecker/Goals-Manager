@@ -1,45 +1,65 @@
-import { Plus, Trash2, } from 'lucide-react'
-import { OutlineButton } from './ui/outline-button'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getPendingGoals } from '../http/get-pending-goals'
-import { createGoalCompletion } from '../http/create-goal-completion'
-import { Button } from './ui/button'
-import { getDailyGoals } from '../http/get-daily-goals'
-
+import { Plus, Trash2 } from "lucide-react";
+import { OutlineButton } from "./ui/outline-button";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getPendingGoals } from "../http/get-pending-goals";
+import { createGoalCompletion } from "../http/create-goal-completion";
+import { deleteGoal } from "../http/delete-goal";
+import { Button } from "./ui/button";
 
 export function PendingGoals() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['pending-goals'],
+  // Fetch de metas pendentes
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["pending-goals"],
     queryFn: getPendingGoals,
-  })
+  });
 
-  async function fetchData() {
+  // Mutation para completar metas
+  const createCompletionMutation = useMutation({
+    mutationFn: createGoalCompletion,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pending-goals"] });
+      queryClient.invalidateQueries({ queryKey: ["summary"] });
+    },
+    onError: (error) => {
+      console.error("Error completing goal:", error);
+    },
+  });
 
-      const data = await getDailyGoals();
-      setDailyGoals(data);
-    
+  // Mutation para deletar metas
+  const deleteGoalMutation = useMutation({
+    mutationFn: deleteGoal,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pending-goals"] });
+      queryClient.invalidateQueries({ queryKey: ["summary"] });
+    },
+    onError: (error) => {
+      console.error("Error deleting goal:", error);
+    },
+  });
+
+  if (isLoading) {
+    return <p>Loading pending goals...</p>;
   }
 
-  if (isLoading || !data) {
-    return null
+  if (isError || !data) {
+    return <p>Failed to load pending goals.</p>;
   }
 
-  async function handleCreateGoalCompletion(goalId: string) {
-    await createGoalCompletion({ goalId })
+  const handleCreateGoalCompletion = async (goalId: string) => {
+    createCompletionMutation.mutate({ goalId });
+  };
 
-    queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
-    queryClient.invalidateQueries({ queryKey: ['summary'] })
-
-    await fetchData();
-
-  }
+  const handleDeleteGoal = async (goalId: string) => {
+    deleteGoalMutation.mutate({ goalId });
+  };
 
   return (
     <div className="flex flex-col gap-3">
-      {data.pendingGoals.map(goal => {
-        const isGoalCompleted = goal.completionCount >= goal.desiredWeeklyFrequency;
+      {data.pendingGoals.map((goal) => {
+        const isGoalCompleted =
+          goal.completionCount >= goal.desiredWeeklyFrequency;
 
         return (
           <OutlineButton
@@ -54,9 +74,14 @@ export function PendingGoals() {
               </div>
               {!isGoalCompleted && (
                 <div className="flex items-center gap-3">
-
-                  <Button /*onClick={}*/ className='w-12 h-8 bg-inherit hover:bg-slate-500 hover:bg-opacity-20'>
-                  <Trash2 className="text-red-800 " />
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteGoal(goal.id);
+                    }}
+                    className="w-12 h-8 bg-inherit hover:bg-slate-500 hover:bg-opacity-20"
+                  >
+                    <Trash2 className="text-red-800" />
                   </Button>
                 </div>
               )}
@@ -65,7 +90,5 @@ export function PendingGoals() {
         );
       })}
     </div>
-
-
-  )
+  );
 }
