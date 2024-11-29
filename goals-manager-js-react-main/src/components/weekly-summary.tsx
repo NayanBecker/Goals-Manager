@@ -31,12 +31,17 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
   useEffect(() => {
     const fetchData = async () => {
       if (showGraph) {
-        const data = await getDailyGoals();
-        setDailyGoals(data);
+        try {
+          const data = await getDailyGoals();
+          console.log("Dados retornados por getDailyGoals:", data); // Debug
+          setDailyGoals(data);
+        } catch (error) {
+          console.error("Erro ao buscar daily goals:", error); // Debug
+        }
       }
     };
     fetchData();
-  }, [showGraph]); //
+  }, [showGraph]);
 
   const completedPercentage = Math.round(
     (summary.completed * 100) / summary.total
