@@ -8,11 +8,7 @@ interface UserProfile {
   avatarUrl: string;
 }
 
-interface ProfileProps {
-  completedGoals: number;
-}
-
-const Profile = ({ completedGoals }: ProfileProps) => {
+const Profile = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
 
