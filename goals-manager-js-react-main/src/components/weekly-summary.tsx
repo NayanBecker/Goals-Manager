@@ -15,6 +15,8 @@ import { Button } from "./ui/button";
 import { DailyGoals } from "./daily-goals";
 import { PendingGoals } from "./pending-goals";
 import { toDate, fromDate } from "./ui/weekdate";
+import UserProfile from "./user-profile";
+import FlameIcon from "./ui/FlameIcon";
 
 dayjs.locale(ptBR);
 
@@ -23,6 +25,7 @@ interface WeeklySummaryProps {
 }
 
 export function WeeklySummary({ summary }: WeeklySummaryProps) {
+  const totalCompletedGoals = summary.completed;
   const [showGraph, setShowGraph] = useState(false);
   const [dailyGoals, setDailyGoals] = useState<GetDailyGoalsResponse | null>(
     null
@@ -52,12 +55,19 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
 
   return (
     <main
-      className="max-w-[640px] min-h-[900px] py-10 px-5 mx-auto flex flex-col gap-5
+      className="max-w-[640px] min-h-[900px] py-5 px-5 mx-auto flex flex-col gap-5
     bg-slate-900
     ring-2 ring-offset-2 ring-offset-blue-300 hover:ring-offset-blue-500
     "
     >
       <div className="pb-4">
+        <div className="bg-slate-950 rounded-xl px-4 py-3 shadow-shape flex items-center justify-between mb-5">
+          <UserProfile completedGoals={totalCompletedGoals} />
+          <div className="flex align-middle justify-center">
+            <span className="text-xxs text-zinc-400">{summary.completed}</span>
+            <FlameIcon />
+          </div>
+        </div>
         <div className="flex items-center justify-between ">
           <div className="flex items-center gap-3">
             <img src={newIcon} alt="Descrição do Ícone" width={60} />
