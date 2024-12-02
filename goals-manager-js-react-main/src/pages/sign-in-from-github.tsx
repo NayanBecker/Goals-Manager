@@ -191,7 +191,7 @@ export function SignInWithGithub() {
           <div className="text-white text-3xl absolute top-5 font-bold">Login</div>
           
           {/* Formulário de Login */}
-          <div className="bg-white p-8 rounded-lg w-96">
+          <div className="bg-white p-8 rounded-lg w-96 text-slate-950">
             <div className="mb-4">
               <label htmlFor="email" className="block text-slate-950 font-semibold mb-2">E-mail</label>
               <input
@@ -245,7 +245,7 @@ export function SignInWithGithub() {
           <div className="text-white text-3xl absolute top-5 font-bold">Criar Conta</div>
 
           {/* Formulário de Criar Conta */}
-          <div className="bg-white p-8 rounded-lg w-96">
+          <div className="bg-white p-8 rounded-lg w-96 text-slate-950">
             {/* E-mail */}
             <div className="mb-4">
               <label htmlFor="email" className="block text-slate-950 font-semibold mb-2">E-mail</label>
