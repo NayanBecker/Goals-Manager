@@ -62,9 +62,11 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
     >
       <div className="pb-4">
         <div className="bg-slate-950 rounded-xl px-4 py-3 shadow-shape flex items-center justify-between mb-5">
-          <UserProfile completedGoals={totalCompletedGoals} />
+          <UserProfile />
           <div className="flex align-middle justify-center">
-            <span className="text-xxs text-zinc-400">{summary.completed}</span>
+            <span className="text-xxs text-zinc-400">
+              {totalCompletedGoals}
+            </span>
             <FlameIcon />
           </div>
         </div>
