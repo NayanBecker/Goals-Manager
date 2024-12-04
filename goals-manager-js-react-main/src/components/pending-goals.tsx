@@ -60,34 +60,37 @@ export function PendingGoals() {
       {data.pendingGoals.map((goal) => {
         const isGoalCompleted =
           goal.completionCount >= goal.desiredWeeklyFrequency;
-
-        return (
-          <OutlineButton
-            key={goal.id}
-            onClick={() => handleCreateGoalCompletion(goal.id)}
-            disabled={isGoalCompleted}
-          >
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2">
-                <Plus className="size-4 text-zinc-600" />
-                {goal.title}
-              </div>
-              {!isGoalCompleted && (
-                <div className="flex items-center gap-3">
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteGoal(goal.id);
-                    }}
-                    className="w-12 h-8 bg-inherit hover:bg-slate-500 hover:bg-opacity-20"
-                  >
-                    <Trash2 className="text-red-800" />
-                  </Button>
+          return (
+            <OutlineButton
+              key={goal.id}
+              onClick={() => handleCreateGoalCompletion(goal.id)}
+              disabled={isGoalCompleted}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2">
+                  <Plus className="size-4 text-purple-800" />
+                  {goal.title}
                 </div>
-              )}
-            </div>
-          </OutlineButton>
-        );
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-white">
+                    {goal.completionCount}/{goal.desiredWeeklyFrequency}
+                  </span>
+                  {!isGoalCompleted && (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteGoal(goal.id);
+                      }}
+                      className="w-12 h-8 bg-inherit hover:bg-slate-500 hover:bg-opacity-20"
+                    >
+                      <Trash2 className="text-red-800" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </OutlineButton>
+          );
+          
       })}
     </div>
   );
