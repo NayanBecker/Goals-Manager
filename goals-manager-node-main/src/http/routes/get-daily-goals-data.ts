@@ -13,10 +13,15 @@ export const getDailyGoalsChartRoute: FastifyPluginAsyncZod = async app => {
         description: 'Daily Chart',
       },
     },
-    async () => {
-      const { dailyChart } = await getDailyGoalsChart()
-
-      return { dailyChart }
+    async (request, reply) => {
+      try {
+        const userId = request.user.sub
+        const { dailyChart } = await getDailyGoalsChart({ userId })
+        return reply.send({ dailyChart })
+      } catch (error) {
+        console.error('Erro ao buscar metas diárias:', error)
+        return reply.status(500).send({ error: 'Erro interno do servidor' })
+      }
     }
   )
 }
