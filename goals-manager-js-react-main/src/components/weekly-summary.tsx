@@ -1,4 +1,6 @@
 import { CheckCircle2, Plus, ChartNoAxesCombined } from "lucide-react";
+import BackgroundEmptyGoals from "../assets/EmptyGoalsBG.svg";
+
 import newIcon from "@/assets/Goal-Manager-Logo.png";
 import { useState, useEffect } from "react";
 import { DialogTrigger } from "@radix-ui/react-dialog";
@@ -56,12 +58,19 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
   return (
     <main
       className="max-w-[640px] min-h-[900px] py-5 px-5 mx-auto flex flex-col gap-5
-    bg-slate-900
-    ring-2 ring-offset-2 ring-offset-blue-300 hover:ring-offset-blue-500
-    "
+      bg-slate-900
+      ring-2 ring-offset-2 ring-offset-blue-300 hover:ring-offset-blue-500
+      "
     >
       <div className="pb-4">
-        <div className="bg-slate-950 rounded-xl px-4 py-3 shadow-shape flex items-center justify-between mb-5">
+        <div
+          className="bg-slate-950 rounded-xl px-4 py-3 shadow-shape flex items-center justify-between mb-5"
+          style={{
+            backgroundImage: `url(${BackgroundEmptyGoals})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
           <UserProfile />
           <div className="flex align-middle justify-center">
             <span className="text-xxs text-zinc-400">
