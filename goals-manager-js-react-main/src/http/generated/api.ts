@@ -20,6 +20,32 @@ import type {
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query'
+export type UpdateGoal404 = {
+  message: string;
+};
+
+export type UpdateGoal200UpdatedGoal = {
+  createdAt: string;
+  desiredWeeklyFrequency: number;
+  id: string;
+  title: string;
+};
+
+export type UpdateGoal200 = {
+  error?: string;
+  success: boolean;
+  updatedGoal?: UpdateGoal200UpdatedGoal;
+};
+
+export type UpdateGoalBody = {
+  /**
+   * @minimum 1
+   * @maximum 7
+   */
+  desiredWeeklyFrequency?: number;
+  title?: string;
+};
+
 export type GetProfile200Profile = {
   avatarUrl: string;
   /** @nullable */
@@ -793,3 +819,75 @@ export function useGetProfile<TData = Awaited<ReturnType<typeof getProfile>>, TE
 
 
 
+/**
+ * Update a goal
+ */
+export type updateGoalResponse = {
+  data: UpdateGoal200;
+  status: number;
+}
+
+export const getUpdateGoalUrl = (goalId: string,) => {
+
+
+  return `http://localhost:3333/update/${goalId}`
+}
+
+export const updateGoal = async (goalId: string,
+    updateGoalBody: UpdateGoalBody, options?: RequestInit): Promise<updateGoalResponse> => {
+  
+  const res = await fetch(getUpdateGoalUrl(goalId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateGoalBody,)
+  }
+
+  )
+  const data = await res.json()
+
+  return { status: res.status, data }
+}
+
+
+
+
+export const getUpdateGoalMutationOptions = <TError = UpdateGoal404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateGoal>>, TError,{goalId: string;data: UpdateGoalBody}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof updateGoal>>, TError,{goalId: string;data: UpdateGoalBody}, TContext> => {
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateGoal>>, {goalId: string;data: UpdateGoalBody}> = (props) => {
+          const {goalId,data} = props ?? {};
+
+          return  updateGoal(goalId,data,fetchOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateGoalMutationResult = NonNullable<Awaited<ReturnType<typeof updateGoal>>>
+    export type UpdateGoalMutationBody = UpdateGoalBody
+    export type UpdateGoalMutationError = UpdateGoal404
+
+    export const useUpdateGoal = <TError = UpdateGoal404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateGoal>>, TError,{goalId: string;data: UpdateGoalBody}, TContext>, fetch?: RequestInit}
+): UseMutationResult<
+        Awaited<ReturnType<typeof updateGoal>>,
+        TError,
+        {goalId: string;data: UpdateGoalBody},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateGoalMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    

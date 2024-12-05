@@ -1,13 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/Goal-Manager-Logo.png"/>
+    <link rel="icon" href="/Goal-Manager-Logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Goal Goal-Manager</title>
   </head>
-  <body class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-zinc-50 antialiased py-1 mx-1 ">
+  <body class="text-zinc-50 antialiased py-1 mx-1">
+    <style>
+      body {
+        background-image: url("./src/assets/EmptyGoalsBG.png");
+        background-size: cover;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-position: center;
+        position: relative;
+      }
+    </style>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

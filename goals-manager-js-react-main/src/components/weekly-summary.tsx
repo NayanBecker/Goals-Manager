@@ -1,4 +1,6 @@
 import { CheckCircle2, Plus, ChartNoAxesCombined } from "lucide-react";
+import BackgroundEmptyGoals from "../assets/EmptyGoalsBG.svg";
+
 import newIcon from "@/assets/Goal-Manager-Logo.png";
 import { useState, useEffect } from "react";
 import { DialogTrigger } from "@radix-ui/react-dialog";
@@ -15,6 +17,8 @@ import { Button } from "./ui/button";
 import { DailyGoals } from "./daily-goals";
 import { PendingGoals } from "./pending-goals";
 import { toDate, fromDate } from "./ui/weekdate";
+import UserProfile from "./user-profile";
+import FlameIcon from "./ui/FlameIcon";
 
 dayjs.locale(ptBR);
 
@@ -23,6 +27,7 @@ interface WeeklySummaryProps {
 }
 
 export function WeeklySummary({ summary }: WeeklySummaryProps) {
+  const totalCompletedGoals = summary.completed;
   const [showGraph, setShowGraph] = useState(false);
   const [dailyGoals, setDailyGoals] = useState<GetDailyGoalsResponse | null>(
     null
@@ -31,12 +36,17 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
   useEffect(() => {
     const fetchData = async () => {
       if (showGraph) {
-        const data = await getDailyGoals();
-        setDailyGoals(data);
+        try {
+          const data = await getDailyGoals();
+          console.log("Dados retornados por getDailyGoals:", data); // Debug
+          setDailyGoals(data);
+        } catch (error) {
+          console.error("Erro ao buscar daily goals:", error); // Debug
+        }
       }
     };
     fetchData();
-  }, [showGraph]); //
+  }, [showGraph]);
 
   const completedPercentage = Math.round(
     (summary.completed * 100) / summary.total
@@ -47,12 +57,28 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
 
   return (
     <main
-      className="max-w-[640px] min-h-[900px] py-10 px-5 mx-auto flex flex-col gap-5
-    bg-slate-900
-    ring-2 ring-offset-2 ring-offset-blue-300 hover:ring-offset-blue-500
-    "
+      className="max-w-[640px] min-h-[900px] py-5 px-5 mx-auto flex flex-col gap-5
+      bg-slate-900
+      ring-2 ring-offset-2 ring-offset-blue-300 hover:ring-offset-blue-500
+      "
     >
       <div className="pb-4">
+        <div
+          className="bg-slate-950 rounded-xl px-4 py-3 shadow-shape flex items-center justify-between mb-5"
+          style={{
+            backgroundImage: `url(${BackgroundEmptyGoals})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <UserProfile />
+          <div className="flex align-middle justify-center">
+            <span className="text-xxs text-zinc-400">
+              {totalCompletedGoals}
+            </span>
+            <FlameIcon />
+          </div>
+        </div>
         <div className="flex items-center justify-between ">
           <div className="flex items-center gap-3">
             <img src={newIcon} alt="Descrição do Ícone" width={60} />

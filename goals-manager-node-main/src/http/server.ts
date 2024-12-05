@@ -14,12 +14,13 @@ import { createGoalCompletionRoute } from './routes/create-goal-completion'
 import { getWeekSummaryRoute } from './routes/get-week-summary'
 import { getWeekPendingGoalsRoute } from './routes/get-week-pending-goals'
 import { getDailyGoalsChartRoute } from './routes/get-daily-goals-data'
-import { deleteGoalRoute } from './routes/Delete-goal'
+import { deleteGoalRoute } from './routes/delete-goal'
 import { authenticateFromGithubRoute } from './routes/authenticate-github-user'
 import { env } from '@/env'
 import { getProfileRoute } from './routes/get-profile'
 import { resolve } from 'node:path'
 import { writeFile } from 'node:fs/promises'
+import { updateGoalRoute } from './routes/update-goal'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -53,6 +54,7 @@ app.register(getDailyGoalsChartRoute)
 app.register(deleteGoalRoute)
 app.register(authenticateFromGithubRoute)
 app.register(getProfileRoute)
+app.register(updateGoalRoute)
 
 app.listen({ port: 3333 }).then(() => {
   console.log('HTTP server running!')

@@ -17,18 +17,30 @@ import { Label } from "./ui/label";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createGoal } from "../http/create-goal";
+import { updateGoal } from "../http/update-goal";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
-const createGoalSchema = z.object({
-  title: z.string().min(1, "Informe a meta que deseja cumprir"),
+const updateGoalSchema = z.object({
+  title: z.string().min(1, "Informe a Meta que deseja atualizar"),
   desiredWeeklyFrequency: z.coerce.number().min(1).max(7),
 });
 
-type CreateGoalSchema = z.infer<typeof createGoalSchema>;
+type UpdateGoalSchema = z.infer<typeof updateGoalSchema>;
 
-export function CreateGoal() {
+interface UpdateGoalProps {
+  goalId: string;
+  currentTitle: string;
+  currentFrequency: number;
+  onClose: () => void; // Para fechar o diálogo
+}
+
+export function UpdateGoal({
+  goalId,
+  currentTitle,
+  currentFrequency,
+  onClose,
+}: UpdateGoalProps) {
   const queryClient = useQueryClient();
 
   const {
@@ -37,28 +49,33 @@ export function CreateGoal() {
     formState: { errors },
     control,
     reset,
-  } = useForm<CreateGoalSchema>({
-    resolver: zodResolver(createGoalSchema),
+  } = useForm<UpdateGoalSchema>({
+    resolver: zodResolver(updateGoalSchema),
+    defaultValues: {
+      title: currentTitle,
+      desiredWeeklyFrequency: currentFrequency,
+    },
   });
 
-  async function handleCreateGoal({
+  async function handleUpdateGoal({
     title,
     desiredWeeklyFrequency,
-  }: CreateGoalSchema) {
+  }: UpdateGoalSchema) {
     try {
-      await createGoal({
+      await updateGoal({
+        goalId,
         title,
         desiredWeeklyFrequency,
       });
 
       reset();
-
       queryClient.invalidateQueries({ queryKey: ["pending-goals"] });
       queryClient.invalidateQueries({ queryKey: ["summary"] });
 
-      toast.success("Meta criada com sucesso!");
+      toast.success("Meta atualizada com sucesso!");
+      onClose(); // Fechar o diálogo após sucesso
     } catch {
-      toast.error("Erro ao criar a meta, tente novamente!");
+      toast.error("Erro ao atualizar a meta, tente novamente!");
     }
   }
 
@@ -67,31 +84,30 @@ export function CreateGoal() {
       <div className="flex flex-col gap-6 h-full">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <DialogTitle>Cadastrar meta</DialogTitle>
+            <DialogTitle>Atualizar meta</DialogTitle>
 
-            <DialogClose>
+            <DialogClose asChild>
               <X className="size-5 text-zinc-600" />
             </DialogClose>
           </div>
 
           <DialogDescription>
-            Adicione atividades que te fazem bem e que você quer continuar
-            praticando toda semana.
+            Atualize os detalhes da sua atividade semanal.
           </DialogDescription>
         </div>
 
         <form
-          onSubmit={handleSubmit(handleCreateGoal)}
+          onSubmit={handleSubmit(handleUpdateGoal)}
           className="flex-1 flex flex-col justify-between"
         >
           <div className="space-y-6">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Qual a Meta?</Label>
+              <Label htmlFor="title">Qual a meta?</Label>
 
               <Input
                 id="title"
                 autoFocus
-                placeholder="Praticar exercícios, meditar, etc..."
+                placeholder="Atualizar exercícios, meditação, etc..."
                 {...register("title")}
               />
 
@@ -108,7 +124,6 @@ export function CreateGoal() {
               <Controller
                 control={control}
                 name="desiredWeeklyFrequency"
-                defaultValue={5}
                 render={({ field }) => {
                   return (
                     <RadioGroup
