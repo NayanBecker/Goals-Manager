@@ -1,6 +1,5 @@
 import { CheckCircle2, Plus, ChartNoAxesCombined } from "lucide-react";
 import BackgroundEmptyGoals from "../assets/EmptyGoalsBG.svg";
-
 import newIcon from "@/assets/Goal-Manager-Logo.png";
 import { useState, useEffect } from "react";
 import { DialogTrigger } from "@radix-ui/react-dialog";
@@ -9,7 +8,7 @@ import dayjs from "dayjs";
 import {
   getDailyGoals,
   type GetDailyGoalsResponse,
-} from "@/http/get-daily-goals";
+} from "@/http/get-daily-chart";
 import type { GetSummaryResponse } from "@/http/get-summary";
 import { Progress, ProgressIndicator } from "./ui/progress-bar";
 import { Separator } from "./ui/separator";
@@ -17,6 +16,7 @@ import { Button } from "./ui/button";
 import { DailyGoals } from "./daily-goals";
 import { PendingGoals } from "./pending-goals";
 import { toDate, fromDate } from "./ui/weekdate";
+import { useSearchParams } from "react-router-dom";
 import UserProfile from "./user-profile";
 import FlameIcon from "./ui/FlameIcon";
 
@@ -32,6 +32,43 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
   const [dailyGoals, setDailyGoals] = useState<GetDailyGoalsResponse | null>(
     null
   );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const weekStartsAtParam = searchParams.get("week_starts_at");
+
+  const weekStartsAt = weekStartsAtParam
+    ? new Date(weekStartsAtParam)
+    : new Date();
+
+  const fromDate = dayjs(weekStartsAt).startOf("week").format("D[ de ]MMM");
+  const toDate = dayjs(weekStartsAt).endOf("week").format("D[ de ]MMM");
+
+  const completedPercentage = summary.total
+    ? Math.round((summary.completed * 100) / summary.total)
+    : 0;
+
+  function handlePreviousWeek() {
+    const params = new URLSearchParams(searchParams);
+
+    params.set(
+      "week_starts_at",
+      dayjs(weekStartsAt).subtract(7, "days").toISOString()
+    );
+
+    setSearchParams(params);
+  }
+
+  function handleNextWeek() {
+    const params = new URLSearchParams(searchParams);
+
+    params.set(
+      "week_starts_at",
+      dayjs(weekStartsAt).add(7, "days").toISOString()
+    );
+
+    setSearchParams(params);
+  }
+
+  const isCurrentWeek = dayjs(weekStartsAt).endOf("week").isAfter(new Date());
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,9 +85,6 @@ export function WeeklySummary({ summary }: WeeklySummaryProps) {
     fetchData();
   }, [showGraph]);
 
-  const completedPercentage = Math.round(
-    (summary.completed * 100) / summary.total
-  );
   const handleShowGraph = () => {
     setShowGraph(!showGraph);
   };
