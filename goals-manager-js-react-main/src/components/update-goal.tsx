@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
 const updateGoalSchema = z.object({
-  title: z.string().min(1, "Informe a atividade que deseja atualizar"),
+  title: z.string().min(1, "Informe a Meta que deseja atualizar"),
   desiredWeeklyFrequency: z.coerce.number().min(1).max(7),
 });
 
@@ -102,7 +102,7 @@ export function UpdateGoal({
         >
           <div className="space-y-6">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Qual a atividade?</Label>
+              <Label htmlFor="title">Qual a meta?</Label>
 
               <Input
                 id="title"

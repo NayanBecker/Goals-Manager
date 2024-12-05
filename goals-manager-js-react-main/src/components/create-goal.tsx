@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
 const createGoalSchema = z.object({
-  title: z.string().min(1, "Informe a atividade que deseja praticar"),
+  title: z.string().min(1, "Informe a meta que deseja cumprir"),
   desiredWeeklyFrequency: z.coerce.number().min(1).max(7),
 });
 
@@ -86,7 +86,7 @@ export function CreateGoal() {
         >
           <div className="space-y-6">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Qual a atividade?</Label>
+              <Label htmlFor="title">Qual a Meta?</Label>
 
               <Input
                 id="title"
